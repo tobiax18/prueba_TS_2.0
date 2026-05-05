@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum ReportType {
+  TRANSPORTES_ACTIVOS
+  RESERVAS_POR_FECHA
+  REPORTES_POR_USUARIO
+  ADMINISTRATIVO
+}
+
+enum TransportStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id            String         @id @default(uuid()) @db.Uuid
+  fullName      String         @map("full_name")
+  email         String         @unique
+  passwordHash  String         @map("password_hash")
+  role          Role           @default(USER)
+  isActive      Boolean        @default(true) @map("is_active")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  reports       Report[]
+  reservations  Reservation[]
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  userAgent String?   @map("user_agent")
+  ipAddress String?   @map("ip_address")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@map("refresh_tokens")
+}
+
+model Report {
+  id          String     @id @default(uuid()) @db.Uuid
+  tipo        ReportType
+  fecha       DateTime   @db.Timestamp(3)
+  usuarioId   String     @map("usuario_id") @db.Uuid
+  descripcion String
+  isActive    Boolean    @default(true) @map("is_active")
+  deletedAt   DateTime?  @map("deleted_at")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  usuario     User       @relation(fields: [usuarioId], references: [id])
+
+  @@index([usuarioId, tipo, fecha, isActive])
+  @@map("reports")
+}
+
+model TransportUnit {
+  id           String          @id @default(uuid()) @db.Uuid
+  code         String          @unique
+  plateNumber  String          @unique @map("plate_number")
+  status       TransportStatus @default(ACTIVE)
+  capacity     Int
+  isActive     Boolean         @default(true) @map("is_active")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  reservations Reservation[]
+
+  @@index([status, isActive])
+  @@map("transport_units")
+}
+
+model Reservation {
+  id              String            @id @default(uuid()) @db.Uuid
+  code            String            @unique
+  travelDate      DateTime          @map("travel_date") @db.Timestamp(3)
+  seats           Int
+  status          ReservationStatus @default(PENDING)
+  userId          String            @map("user_id") @db.Uuid
+  transportUnitId String            @map("transport_unit_id") @db.Uuid
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  user            User              @relation(fields: [userId], references: [id])
+  transportUnit   TransportUnit     @relation(fields: [transportUnitId], references: [id])
+
+  @@index([travelDate, status])
+  @@map("reservations")
+}
+
+model ScheduledReportRun {
+  id           String     @id @default(uuid()) @db.Uuid
+  reportType   ReportType @map("report_type")
+  format       String
+  status       String
+  trigger      String
+  fileName     String?    @map("file_name")
+  filters      Json?
+  recordsCount Int?       @map("records_count")
+  summary      Json?
+  generatedAt  DateTime   @default(now()) @map("generated_at")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@map("scheduled_report_runs")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  action     String
+  entity     String
+  entityId   String?  @map("entity_id")
+  userId     String?  @map("user_id") @db.Uuid
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@map("audit_logs")
+}

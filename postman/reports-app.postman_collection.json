@@ -1,0 +1,202 @@
+{
+  "info": {
+    "name": "Enterprise Reports Hub",
+    "_postman_id": "6578f82a-5b3b-4f2d-9e35-515c9de7f900",
+    "description": "Colección base para probar autenticación, CRUD de reportes y dashboard.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "usuarioId",
+      "value": ""
+    },
+    {
+      "key": "reporteId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth - Signup",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Andrea Ruiz\",\n  \"email\": \"andrea@empresa.com\",\n  \"password\": \"Segura123!\"\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/auth/signup"
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@reportes.com\",\n  \"password\": \"Admin123!\"\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/auth/login"
+      }
+    },
+    {
+      "name": "Auth - Refresh Token",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/v1/auth/refresh-token"
+      }
+    },
+    {
+      "name": "Auth - Logout",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/auth/logout"
+      }
+    },
+    {
+      "name": "Reportes - Crear",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tipo\": \"ADMINISTRATIVO\",\n  \"fecha\": \"2026-04-28\",\n  \"usuarioId\": \"{{usuarioId}}\",\n  \"descripcion\": \"Resumen ejecutivo diario con KPIs y control de actividad del sistema.\"\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/reportes"
+      }
+    },
+    {
+      "name": "Reportes - Listar",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/reportes?page=1&limit=10"
+      }
+    },
+    {
+      "name": "Reportes - Buscar",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/reportes/search?q=administrativo"
+      }
+    },
+    {
+      "name": "Reportes - Obtener por ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/reportes/{{reporteId}}"
+      }
+    },
+    {
+      "name": "Reportes - Actualizar",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"descripcion\": \"Descripción ajustada para seguimiento administrativo.\"\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/reportes/{{reporteId}}"
+      }
+    },
+    {
+      "name": "Reportes - Eliminar",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/reportes/{{reporteId}}"
+      }
+    },
+    {
+      "name": "Dashboard - Metrics",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/dashboard/metrics"
+      }
+    },
+    {
+      "name": "PDF - Administrativo",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/reportes/pdf?plantilla=administrativo"
+      }
+    }
+  ]
+}

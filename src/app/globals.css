@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --font-sans:
+    "Aptos", "Segoe UI", "Helvetica Neue", "Noto Sans", "Liberation Sans",
+    sans-serif;
+  --font-display:
+    "Aptos Display", "Trebuchet MS", "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #f5f7f3;
+  color: #0f172a;
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
